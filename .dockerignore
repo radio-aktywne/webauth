@@ -1,0 +1,7 @@
+**
+!webauth/
+webauth/.next/
+webauth/docs/
+webauth/node_modules/
+webauth/README.md
+webauth/tsconfig.tsbuildinfo
