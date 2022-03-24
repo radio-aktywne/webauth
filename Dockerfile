@@ -38,9 +38,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-EXPOSE 22000
+EXPOSE 23000
 
-ENV PORT=22000 \
+ENV PORT=23000 \
     WEBAUTH_AUTHE_URL=http://localhost:21000
 
 # Next.js collects completely anonymous telemetry data about general usage.

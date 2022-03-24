@@ -22,5 +22,5 @@ and [`next.js`](https://nextjs.org) installed, then run:
 npm run start
 ```
 
-Then you can visit [`http://localhost:22000`](http://localhost:22000) by
+Then you can visit [`http://localhost:23000`](http://localhost:23000) by
 default.
