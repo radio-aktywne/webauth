@@ -1,10 +1,10 @@
 {
   "private": true,
   "scripts": {
-    "ssl-proxy": "npx local-ssl-proxy --source ${PROXY_PORT:=22001} --target ${PORT:=22000}",
-    "dev": "next dev -p ${PORT:=22000}",
+    "ssl-proxy": "npx local-ssl-proxy --source ${PROXY_PORT:=23001} --target ${PORT:=23000}",
+    "dev": "next dev -p ${PORT:=23000}",
     "build": "next build",
-    "start": "next start -p ${PORT:=22000}"
+    "start": "next start -p ${PORT:=23000}"
   },
   "dependencies": {
     "@ory/integrations": "^0.2.4",
