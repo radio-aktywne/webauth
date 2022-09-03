@@ -11,7 +11,7 @@ import {
   SubmitSelfServiceSettingsFlowBody,
   SubmitSelfServiceVerificationFlowBody,
   UiNode,
-} from "@ory/kratos-client";
+} from "@ory/client";
 import { Component, FormEvent } from "react";
 
 import { Messages } from "./Messages";

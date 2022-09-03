@@ -1,7 +1,7 @@
 import {
   SelfServiceRegistrationFlow,
   SubmitSelfServiceRegistrationFlowBody,
-} from "@ory/kratos-client";
+} from "@ory/client";
 import { AxiosError } from "axios";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -65,7 +65,7 @@ export default function Register() {
       .then(() =>
         ory
           .submitSelfServiceRegistrationFlow(String(flow?.id), values)
-          .then(({ data }) => {
+          .then(() => {
             // If we ended up here, it means we are successfully signed up!
             //
             // You can do cool stuff here, like having access to the identity which just signed up:

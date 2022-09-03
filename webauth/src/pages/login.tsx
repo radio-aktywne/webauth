@@ -1,7 +1,7 @@
 import {
   SelfServiceLoginFlow,
   SubmitSelfServiceLoginFlowBody,
-} from "@ory/kratos-client";
+} from "@ory/client";
 import { AxiosError } from "axios";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -74,7 +74,7 @@ export default function Login() {
       .push(`/login?flow=${flow?.id}`, undefined, { shallow: true })
       .then(() =>
         ory
-          .submitSelfServiceLoginFlow(String(flow?.id), undefined, values)
+          .submitSelfServiceLoginFlow(String(flow?.id), values)
           // We logged in successfully! Let's bring the user home.
           .then(() => {
             toast.success("Logged in!");

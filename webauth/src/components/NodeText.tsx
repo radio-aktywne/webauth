@@ -1,4 +1,4 @@
-import { UiNode, UiNodeTextAttributes, UiText } from "@ory/kratos-client";
+import { UiNode, UiNodeTextAttributes, UiText } from "@ory/client";
 import CodeBox from "./CodeBox";
 import { P } from "./Typography";
 
