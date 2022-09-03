@@ -1,7 +1,7 @@
 import {
   SelfServiceSettingsFlow,
   SubmitSelfServiceSettingsFlowBody,
-} from "@ory/kratos-client";
+} from "@ory/client";
 import { AxiosError } from "axios";
 import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
@@ -85,7 +85,7 @@ export default function Settings() {
       .push(`/settings?flow=${flow?.id}`, undefined, { shallow: true })
       .then(() =>
         ory
-          .submitSelfServiceSettingsFlow(String(flow?.id), undefined, values)
+          .submitSelfServiceSettingsFlow(String(flow?.id), values)
           .then(({ data }) => {
             // The settings have been saved and the flow was updated. Let's show it to the user!
             toast.success("Settings saved!");
