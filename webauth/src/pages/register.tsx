@@ -42,7 +42,7 @@ export default function Register() {
           // We received the flow - let's use its data and render the form!
           setFlow(data);
         })
-        .catch(handleFlowError(router, "register", setFlow));
+        .catch(handleFlowError(router, "register", router.query, setFlow));
       return;
     }
 
@@ -54,7 +54,7 @@ export default function Register() {
       .then(({ data }) => {
         setFlow(data);
       })
-      .catch(handleFlowError(router, "register", setFlow));
+      .catch(handleFlowError(router, "register", router.query, setFlow));
   }, [flowId, router, router.isReady, returnTo, flow]);
 
   const onSubmit = (values: SubmitSelfServiceRegistrationFlowBody) =>
@@ -74,7 +74,7 @@ export default function Register() {
             // For now however we just want to redirect home!
             return router.push(flow?.return_to || "/").then(() => {});
           })
-          .catch(handleFlowError(router, "register", setFlow))
+          .catch(handleFlowError(router, "register", router.query, setFlow))
           .catch((err: AxiosError) => {
             // If the previous handler did not catch the error it's most likely a form validation error
             if (err.response?.status === 400) {

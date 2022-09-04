@@ -63,7 +63,7 @@ export default function Settings() {
         .then(({ data }) => {
           setFlow(data);
         })
-        .catch(handleFlowError(router, "settings", setFlow));
+        .catch(handleFlowError(router, "settings", router.query, setFlow));
       return;
     }
 
@@ -75,7 +75,7 @@ export default function Settings() {
       .then(({ data }) => {
         setFlow(data);
       })
-      .catch(handleFlowError(router, "settings", setFlow));
+      .catch(handleFlowError(router, "settings", router.query, setFlow));
   }, [flowId, router, router.isReady, returnTo, flow]);
 
   const onSubmit = (values: SubmitSelfServiceSettingsFlowBody) =>
@@ -91,7 +91,7 @@ export default function Settings() {
             toast.success("Settings saved!");
             setFlow(data);
           })
-          .catch(handleFlowError(router, "settings", setFlow))
+          .catch(handleFlowError(router, "settings", router.query, setFlow))
           .catch(async (err: AxiosError) => {
             // If the previous handler did not catch the error it's most likely a form validation error
             if (err.response?.status === 400) {
