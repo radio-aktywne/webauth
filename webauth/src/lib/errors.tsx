@@ -2,11 +2,13 @@ import { AxiosError } from "axios";
 import { NextRouter } from "next/router";
 import { Dispatch, SetStateAction } from "react";
 import { toast } from "react-toastify";
+import { ParsedUrlQuery } from "querystring";
 
 // A small function to help us deal with errors coming from fetching a flow.
 export default function handleFlowError<S>(
   router: NextRouter,
   page: "login" | "register" | "settings",
+  query: ParsedUrlQuery,
   resetFlow: Dispatch<SetStateAction<S | undefined>>
 ) {
   return async (err: AxiosError) => {
@@ -16,8 +18,12 @@ export default function handleFlowError<S>(
         window.location.href = err.response?.data.redirect_browser_to;
         return;
       case "session_already_available":
-        // User is already signed in, let's redirect them home!
-        await router.push("/");
+        // User is already signed in, let's redirect them!
+        if ("return_to" in query)
+          window.location.href = Array.isArray(query.return_to)
+            ? query.return_to[0]
+            : query.return_to;
+        else await router.push("/");
         return;
       case "session_refresh_required":
         // We need to re-authenticate to perform this action

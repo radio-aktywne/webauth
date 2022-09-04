@@ -50,7 +50,7 @@ export default function Login() {
         .then(({ data }) => {
           setFlow(data);
         })
-        .catch(handleFlowError(router, "login", setFlow));
+        .catch(handleFlowError(router, "login", router.query, setFlow));
       return;
     }
 
@@ -64,7 +64,7 @@ export default function Login() {
       .then(({ data }) => {
         setFlow(data);
       })
-      .catch(handleFlowError(router, "login", setFlow));
+      .catch(handleFlowError(router, "login", router.query, setFlow));
   }, [flowId, router, router.isReady, aal, refresh, returnTo, flow]);
 
   const onSubmit = (values: SubmitSelfServiceLoginFlowBody) =>
@@ -85,7 +85,7 @@ export default function Login() {
             router.push("/").then();
           })
           .then(() => {})
-          .catch(handleFlowError(router, "login", setFlow))
+          .catch(handleFlowError(router, "login", router.query, setFlow))
           .catch((err: AxiosError) => {
             // If the previous handler did not catch the error it's most likely a form validation error
             if (err.response?.status === 400) {
