@@ -35,10 +35,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-EXPOSE 23000
+EXPOSE 21000
 
-ENV PORT=23000 \
+ENV PORT=21000 \
     NEXT_TELEMETRY_DISABLED=1 \
-    WEBAUTH_AUTHE_URL=http://localhost:21000
+    WEBAUTH_AUTHGATE_URL=http://localhost:20000
 
 CMD ["node", "server.js"]

@@ -1,10 +1,10 @@
 {
   "private": true,
   "scripts": {
-    "ssl-proxy": "npx local-ssl-proxy --source ${PROXY_PORT:=23001} --target ${PORT:=23000}",
-    "dev": "next dev -p ${PORT:=23000}",
+    "ssl-proxy": "npx local-ssl-proxy --source ${PROXY_PORT:=21001} --target ${PORT:=21000}",
+    "dev": "next dev -p ${PORT:=21000}",
     "build": "next build",
-    "start": "next start -p ${PORT:=23000}",
+    "start": "next start -p ${PORT:=21000}",
     "update": "ncu -u && npm i",
     "format": "prettier --write ."
   },
