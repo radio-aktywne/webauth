@@ -39,6 +39,7 @@ EXPOSE 21000
 
 ENV PORT=21000 \
     NEXT_TELEMETRY_DISABLED=1 \
-    WEBAUTH_AUTHGATE_URL=http://localhost:20000
+    WEBAUTH_AUTHGATE_URL=http://localhost:20000 \
+    WEBAUTH_COOKIE_DOMAIN=localhost
 
 CMD ["node", "server.js"]
