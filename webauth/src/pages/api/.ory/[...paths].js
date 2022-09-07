@@ -7,4 +7,5 @@ export { config };
 
 export default createApiHandler({
   apiBaseUrlOverride: apiUrl,
+  forceCookieDomain: process.env.WEBAUTH_COOKIE_DOMAIN || "localhost",
 });
