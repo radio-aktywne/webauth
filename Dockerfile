@@ -23,23 +23,22 @@ WORKDIR /app
 
 ENV NODE_ENV production
 
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/start.sh ./start.sh
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
-USER nextjs
+RUN chmod +x ./start.sh
 
 EXPOSE 21000
 
 ENV PORT=21000 \
     NEXT_TELEMETRY_DISABLED=1 \
-    WEBAUTH_AUTHGATE_URL=http://localhost:20000 \
+    WEBAUTH_AUTHGATE_URL=https://localhost:20000 \
     WEBAUTH_COOKIE_DOMAIN=localhost
 
-CMD ["node", "server.js"]
+ENTRYPOINT ["./start.sh"]
+CMD []
