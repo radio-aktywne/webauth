@@ -2,7 +2,6 @@ import {
   SelfServiceLoginFlow,
   SubmitSelfServiceLoginFlowBody,
 } from "@ory/client";
-import { AxiosError } from "axios";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -86,17 +85,6 @@ export default function Login() {
           })
           .then(() => {})
           .catch(handleFlowError(router, "login", router.query, setFlow))
-          .catch((err: AxiosError) => {
-            // If the previous handler did not catch the error it's most likely a form validation error
-            if (err.response?.status === 400) {
-              // Yup, it is!
-              toast.error("Input is invalid.");
-              setFlow(err.response?.data);
-              return;
-            }
-
-            return Promise.reject(err);
-          })
       );
 
   return (

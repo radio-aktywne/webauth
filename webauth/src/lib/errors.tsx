@@ -9,7 +9,7 @@ export default function handleFlowError<S>(
   router: NextRouter,
   page: "login" | "register" | "settings",
   query: ParsedUrlQuery,
-  resetFlow: Dispatch<SetStateAction<S | undefined>>
+  setFlow: Dispatch<SetStateAction<S | undefined>>
 ) {
   return async (err: AxiosError) => {
     switch (err.response?.data.error?.id) {
@@ -32,24 +32,24 @@ export default function handleFlowError<S>(
       case "self_service_flow_return_to_forbidden":
         // The flow expired, let's request a new one.
         toast.error("The redirect address is not allowed.");
-        resetFlow(undefined);
+        setFlow(undefined);
         await router.push("/" + page);
         return;
       case "self_service_flow_expired":
         // The flow expired, let's request a new one.
         toast.error("Your interaction expired.");
-        resetFlow(undefined);
+        setFlow(undefined);
         await router.push("/" + page);
         return;
       case "security_csrf_violation":
         // A CSRF violation occurred. Best to just refresh the flow!
         toast.error("A security violation was detected.");
-        resetFlow(undefined);
+        setFlow(undefined);
         await router.push("/" + page);
         return;
       case "security_identity_mismatch":
         // The requested item was intended for someone else. Let's request a new flow...
-        resetFlow(undefined);
+        setFlow(undefined);
         await router.push("/" + page);
         return;
       case "browser_location_change_required":
@@ -64,16 +64,31 @@ export default function handleFlowError<S>(
     }
 
     switch (err.response?.status) {
+      case 400:
+        if (!err.response?.data?.error) {
+          // Bad request without an error field is a form validation error
+          toast.error("Input is invalid.");
+          setFlow(err.response?.data);
+          return;
+        }
+        break;
       case 410:
         // The flow expired, let's request a new one.
-        resetFlow(undefined);
+        setFlow(undefined);
         await router.push("/" + page);
         return;
       case 500:
         // Internal Kratos error
-        resetFlow(undefined);
+        setFlow(undefined);
         await router.push("/" + page);
         return;
+    }
+
+    if (err.response?.data?.error?.reason) {
+      // If there is a reason for this error, let's display it and redirect to the main page.
+      toast.error(err.response?.data?.error?.reason);
+      await router.push("/");
+      return;
     }
 
     // We are not able to handle the error? Return it.
