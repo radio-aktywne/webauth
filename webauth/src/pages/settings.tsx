@@ -2,7 +2,6 @@ import {
   SelfServiceSettingsFlow,
   SubmitSelfServiceSettingsFlowBody,
 } from "@ory/client";
-import { AxiosError } from "axios";
 import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 
@@ -92,17 +91,6 @@ export default function Settings() {
             setFlow(data);
           })
           .catch(handleFlowError(router, "settings", router.query, setFlow))
-          .catch(async (err: AxiosError) => {
-            // If the previous handler did not catch the error it's most likely a form validation error
-            if (err.response?.status === 400) {
-              // Yup, it is!
-              toast.error("Input is invalid.");
-              setFlow(err.response?.data);
-              return;
-            }
-
-            return Promise.reject(err);
-          })
       );
 
   return (
