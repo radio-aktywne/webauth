@@ -50,11 +50,6 @@ export default function Index() {
             Login
           </LinkButton>
         </Link>
-        <Link href="/register">
-          <LinkButton disabled={hasSession} title={"Sign Up"}>
-            Sign Up
-          </LinkButton>
-        </Link>
         <Link href="/settings">
           <LinkButton disabled={!hasSession} title={"Settings"}>
             Settings
