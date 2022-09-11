@@ -7,7 +7,7 @@ import { ParsedUrlQuery } from "querystring";
 // A small function to help us deal with errors coming from fetching a flow.
 export default function handleFlowError<S>(
   router: NextRouter,
-  page: "login" | "register" | "settings",
+  page: "login" | "recover" | "register" | "settings" | "verify",
   query: ParsedUrlQuery,
   setFlow: Dispatch<SetStateAction<S | undefined>>
 ) {
