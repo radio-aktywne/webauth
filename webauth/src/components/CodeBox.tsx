@@ -11,7 +11,7 @@ export interface CodeBoxProps
 
 export default function CodeBox({
   code,
-  scrollable = false,
+  scrollable = true,
   className,
   ...props
 }: CodeBoxProps) {
