@@ -1,34 +1,34 @@
-import Head from "next/head";
 import { ReactNode } from "react";
-import * as tw from "tailwindcss-classnames";
+import { Center, Container, createStyles, Stack } from "@mantine/core";
 
 export interface LayoutProps {
   children: ReactNode;
-  title: string;
 }
 
-export default function Layout({ children, title }: LayoutProps) {
+const useStyles = createStyles((theme) => ({
+  container: {
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+    padding: theme.spacing.xl,
+  },
+  center: {
+    flex: 1,
+    height: "100%",
+  },
+  stack: {
+    width: "100%",
+  },
+}));
+
+export default function Layout({ children }: LayoutProps) {
+  const { classes } = useStyles();
+
   return (
-    <div>
-      <Head>
-        <title>{title}</title>
-        <link rel="icon" href="/favicon.svg" />
-        <meta name="description" content="authentication web ui" />
-      </Head>
-      <main>
-        <div
-          className={tw.classnames(
-            tw.display("flex"),
-            tw.flexDirection("flex-col"),
-            tw.justifyContent("justify-center"),
-            tw.alignItems("items-center"),
-            tw.minHeight("min-h-screen"),
-            tw.padding("p-10")
-          )}
-        >
-          {children}
-        </div>
-      </main>
-    </div>
+    <Container size="sm" className={classes.container}>
+      <Center className={classes.center}>
+        <Stack className={classes.stack}>{children}</Stack>
+      </Center>
+    </Container>
   );
 }

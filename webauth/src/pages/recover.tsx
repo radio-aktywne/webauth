@@ -2,7 +2,6 @@ import {
   SelfServiceRecoveryFlow,
   SubmitSelfServiceRecoveryFlowBody,
 } from "@ory/client";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import ory from "../lib/ory";
@@ -11,13 +10,20 @@ import Layout from "../components/Layout";
 import Panel from "../components/Panel";
 import PanelTitle from "../components/PanelTitle";
 import Flow from "../components/Flow";
-import CenterLink from "../components/CenterLink";
+import { useLabels } from "../contexts/labels";
+import { useToasts } from "../contexts/toasts";
+import { Box } from "@mantine/core";
+import Head from "next/head";
+import GoBack from "../components/GoBack";
 
 export default function Recover() {
   const [flow, setFlow] = useState<SelfServiceRecoveryFlow>();
 
-  // Get ?flow=... from the URL
   const router = useRouter();
+  const labels = useLabels();
+  const toasts = useToasts();
+
+  // Get ?flow=... from the URL
   const { flow: flowId, return_to: returnTo } = router.query;
 
   useEffect(() => {
@@ -33,7 +39,16 @@ export default function Recover() {
         .then(({ data }) => {
           setFlow(data);
         })
-        .catch(handleFlowError(router, "recover", router.query, setFlow));
+        .catch(
+          handleFlowError(
+            router,
+            "recover",
+            router.query,
+            setFlow,
+            labels,
+            toasts
+          )
+        );
       return;
     }
 
@@ -43,8 +58,17 @@ export default function Recover() {
       .then(({ data }) => {
         setFlow(data);
       })
-      .catch(handleFlowError(router, "recover", router.query, setFlow));
-  }, [flowId, router, router.isReady, returnTo, flow]);
+      .catch(
+        handleFlowError(
+          router,
+          "recover",
+          router.query,
+          setFlow,
+          labels,
+          toasts
+        )
+      );
+  }, [flowId, router, router.isReady, returnTo, flow, toasts]);
 
   const onSubmit = (values: SubmitSelfServiceRecoveryFlowBody) =>
     router
@@ -58,20 +82,32 @@ export default function Recover() {
             // Form submission was successful, show the message to the user!
             setFlow(data);
           })
-          .catch(handleFlowError(router, "recover", router.query, setFlow))
+          .catch(
+            handleFlowError(
+              router,
+              "recover",
+              router.query,
+              setFlow,
+              labels,
+              toasts
+            )
+          )
       );
 
   return (
-    <Layout title={"recover · webauth"}>
-      <Panel>
-        <PanelTitle>Recover your account</PanelTitle>
-        <Flow onSubmit={onSubmit} flow={flow} />
-      </Panel>
-      <Panel>
-        <Link href="/" passHref>
-          <CenterLink>Go back</CenterLink>
-        </Link>
-      </Panel>
-    </Layout>
+    <Box>
+      <Head>
+        <title>{labels.recover.title}</title>
+      </Head>
+      <Layout>
+        <Panel>
+          <PanelTitle>{labels.recover.panel.title}</PanelTitle>
+          <Flow onSubmit={onSubmit} flow={flow} />
+        </Panel>
+        <Panel>
+          <GoBack />
+        </Panel>
+      </Layout>
+    </Box>
   );
 }

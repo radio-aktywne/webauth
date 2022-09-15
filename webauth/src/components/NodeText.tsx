@@ -1,6 +1,8 @@
 import { UiNode, UiNodeTextAttributes, UiText } from "@ory/client";
-import CodeBox from "./CodeBox";
-import { P } from "./Typography";
+import Code from "./Code";
+import { Box, Text } from "@mantine/core";
+import { lookupSecretId } from "../theme/constants";
+import { useLabels } from "../contexts/labels";
 
 interface Props {
   node: UiNode;
@@ -8,36 +10,30 @@ interface Props {
 }
 
 const Content = ({ attributes }: Props) => {
+  const labels = useLabels();
+
   switch (attributes.text.id) {
-    case 1050015:
+    case lookupSecretId:
       // This text node contains lookup secrets. Let's make them a bit more beautiful!
       const secrets = (attributes.text.context as any).secrets.map(
         (text: UiText, k: number) => (
-          <div key={k}>
-            {/* Used lookup_secret has ID 1050014 */}
-            <code>{text.id === 1050014 ? "Used" : text.text}</code>
-          </div>
+          <Code
+            key={k}
+            code={text.id === lookupSecretId ? labels.secretUsed : text.text}
+          />
         )
       );
-      return (
-        <div>
-          <div>{secrets}</div>
-        </div>
-      );
+      return <Box>{secrets}</Box>;
   }
 
-  return (
-    <div>
-      <CodeBox scrollable={true} code={attributes.text.text} />
-    </div>
-  );
+  return <Code code={attributes.text.text} />;
 };
 
 export const NodeText = ({ node, attributes }: Props) => {
   return (
-    <>
-      <P>{node.meta?.label?.text}</P>
+    <Box>
+      <Text>{node.meta?.label?.text}</Text>
       <Content node={node} attributes={attributes} />
-    </>
+    </Box>
   );
 };

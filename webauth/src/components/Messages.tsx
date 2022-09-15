@@ -1,5 +1,6 @@
 import { UiText } from "@ory/client";
-import Alert from "./Alert";
+import { Alert, Stack } from "@mantine/core";
+import { errorAlertColor, infoAlertColor } from "../theme/constants";
 
 interface MessageProps {
   message: UiText;
@@ -7,7 +8,7 @@ interface MessageProps {
 
 export const Message = ({ message }: MessageProps) => {
   return (
-    <Alert severity={message.type === "error" ? "error" : "info"}>
+    <Alert color={message.type === "error" ? errorAlertColor : infoAlertColor}>
       {message.text}
     </Alert>
   );
@@ -24,10 +25,10 @@ export const Messages = ({ messages }: MessagesProps) => {
   }
 
   return (
-    <div>
+    <Stack>
       {messages.map((message) => (
         <Message key={message.id} message={message} />
       ))}
-    </div>
+    </Stack>
   );
 };

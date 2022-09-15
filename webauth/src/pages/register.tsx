@@ -10,14 +10,19 @@ import handleFlowError from "../lib/errors";
 import ory from "../lib/ory";
 import PanelTitle from "../components/PanelTitle";
 import Flow from "../components/Flow";
-import CenterLink from "../components/CenterLink";
 import Layout from "../components/Layout";
 import Panel from "../components/Panel";
-import { toast } from "react-toastify";
+import { useLabels } from "../contexts/labels";
+import { useToasts } from "../contexts/toasts";
+import Head from "next/head";
+import GoBack from "../components/GoBack";
+import { Anchor, Box } from "@mantine/core";
 import Link from "../components/Link";
 
 export default function Register() {
   const router = useRouter();
+  const labels = useLabels();
+  const toasts = useToasts();
 
   // The "flow" represents a registration process and contains
   // information about the form we need to render (e.g. username + password)
@@ -41,7 +46,16 @@ export default function Register() {
           // We received the flow - let's use its data and render the form!
           setFlow(data);
         })
-        .catch(handleFlowError(router, "register", router.query, setFlow));
+        .catch(
+          handleFlowError(
+            router,
+            "register",
+            router.query,
+            setFlow,
+            labels,
+            toasts
+          )
+        );
       return;
     }
 
@@ -53,8 +67,17 @@ export default function Register() {
       .then(({ data }) => {
         setFlow(data);
       })
-      .catch(handleFlowError(router, "register", router.query, setFlow));
-  }, [flowId, router, router.isReady, returnTo, flow]);
+      .catch(
+        handleFlowError(
+          router,
+          "register",
+          router.query,
+          setFlow,
+          labels,
+          toasts
+        )
+      );
+  }, [flowId, router, router.isReady, returnTo, flow, toasts]);
 
   const onSubmit = (values: SubmitSelfServiceRegistrationFlowBody) =>
     router
@@ -68,30 +91,42 @@ export default function Register() {
             // If we ended up here, it means we are successfully signed up!
             //
             // You can do cool stuff here, like having access to the identity which just signed up:
-            toast.success("Successfully registered!");
+            toasts.success(labels.toasts.messages.registered);
 
             // For now however we just want to redirect home!
             return router.push(flow?.return_to || "/").then(() => {});
           })
-          .catch(handleFlowError(router, "register", router.query, setFlow))
+          .catch(
+            handleFlowError(
+              router,
+              "register",
+              router.query,
+              setFlow,
+              labels,
+              toasts
+            )
+          )
       );
 
   return (
-    <Layout title={"register · webauth"}>
-      <Panel>
-        <PanelTitle>Create account</PanelTitle>
-        <Flow onSubmit={onSubmit} flow={flow} />
-      </Panel>
-      <Panel>
-        <Link href="/login" passHref>
-          <CenterLink>Sign in</CenterLink>
-        </Link>
-      </Panel>
-      <Panel>
-        <Link href="/" passHref>
-          <CenterLink>Go back</CenterLink>
-        </Link>
-      </Panel>
-    </Layout>
+    <Box>
+      <Head>
+        <title>{labels.register.title}</title>
+      </Head>
+      <Layout>
+        <Panel>
+          <PanelTitle>{labels.register.panel.title}</PanelTitle>
+          <Flow onSubmit={onSubmit} flow={flow} />
+        </Panel>
+        <Panel>
+          <Link href="/login" passHref>
+            <Anchor component="a">{labels.signIn}</Anchor>
+          </Link>
+        </Panel>
+        <Panel>
+          <GoBack />
+        </Panel>
+      </Layout>
+    </Box>
   );
 }

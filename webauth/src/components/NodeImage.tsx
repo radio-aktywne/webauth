@@ -1,4 +1,5 @@
 import { UiNode, UiNodeImageAttributes } from "@ory/client";
+import { Image } from "@mantine/core";
 
 interface Props {
   node: UiNode;
@@ -6,5 +7,5 @@ interface Props {
 }
 
 export const NodeImage = ({ node, attributes }: Props) => {
-  return <img src={attributes.src} alt={node.meta.label?.text} />;
+  return <Image src={attributes.src} alt={node.meta.label?.text} />;
 };

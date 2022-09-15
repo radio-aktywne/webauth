@@ -2,7 +2,6 @@ import {
   SelfServiceVerificationFlow,
   SubmitSelfServiceVerificationFlowBody,
 } from "@ory/client";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import ory from "../lib/ory";
@@ -10,14 +9,21 @@ import Layout from "../components/Layout";
 import Panel from "../components/Panel";
 import PanelTitle from "../components/PanelTitle";
 import Flow from "../components/Flow";
-import CenterLink from "../components/CenterLink";
 import handleFlowError from "../lib/errors";
+import { useLabels } from "../contexts/labels";
+import { useToasts } from "../contexts/toasts";
+import Head from "next/head";
+import GoBack from "../components/GoBack";
+import { Box } from "@mantine/core";
 
 export default function Verify() {
   const [flow, setFlow] = useState<SelfServiceVerificationFlow>();
 
-  // Get ?flow=... from the URL
   const router = useRouter();
+  const labels = useLabels();
+  const toasts = useToasts();
+
+  // Get ?flow=... from the URL
   const { flow: flowId, return_to: returnTo } = router.query;
 
   useEffect(() => {
@@ -33,7 +39,16 @@ export default function Verify() {
         .then(({ data }) => {
           setFlow(data);
         })
-        .catch(handleFlowError(router, "verify", router.query, setFlow));
+        .catch(
+          handleFlowError(
+            router,
+            "verify",
+            router.query,
+            setFlow,
+            labels,
+            toasts
+          )
+        );
       return;
     }
 
@@ -45,8 +60,10 @@ export default function Verify() {
       .then(({ data }) => {
         setFlow(data);
       })
-      .catch(handleFlowError(router, "verify", router.query, setFlow));
-  }, [flowId, router, router.isReady, returnTo, flow]);
+      .catch(
+        handleFlowError(router, "verify", router.query, setFlow, labels, toasts)
+      );
+  }, [flowId, router, router.isReady, returnTo, flow, toasts]);
 
   const onSubmit = (values: SubmitSelfServiceVerificationFlowBody) =>
     router
@@ -60,20 +77,32 @@ export default function Verify() {
             // Form submission was successful, show the message to the user!
             setFlow(data);
           })
-          .catch(handleFlowError(router, "verify", router.query, setFlow))
+          .catch(
+            handleFlowError(
+              router,
+              "verify",
+              router.query,
+              setFlow,
+              labels,
+              toasts
+            )
+          )
       );
 
   return (
-    <Layout title={"verify · webauth"}>
-      <Panel>
-        <PanelTitle>Verify your account</PanelTitle>
-        <Flow onSubmit={onSubmit} flow={flow} />
-      </Panel>
-      <Panel>
-        <Link href="/" passHref>
-          <CenterLink>Go back</CenterLink>
-        </Link>
-      </Panel>
-    </Layout>
+    <Box>
+      <Head>
+        <title>{labels.verify.title}</title>
+      </Head>
+      <Layout>
+        <Panel>
+          <PanelTitle>{labels.verify.panel.title}</PanelTitle>
+          <Flow onSubmit={onSubmit} flow={flow} />
+        </Panel>
+        <Panel>
+          <GoBack />
+        </Panel>
+      </Layout>
+    </Box>
   );
 }
