@@ -9,18 +9,23 @@ import handleFlowError from "../lib/errors";
 import ory from "../lib/ory";
 import { createLogoutHandler } from "../lib/hooks";
 import PanelTitle from "../components/PanelTitle";
-import CenterLink from "../components/CenterLink";
 import Flow from "../components/Flow";
 import Layout from "../components/Layout";
 import Panel from "../components/Panel";
-import { toast } from "react-toastify";
-import Link from "../components/Link";
+import { useLabels } from "../contexts/labels";
+import { useToasts } from "../contexts/toasts";
+import { Anchor, Box } from "@mantine/core";
+import Head from "next/head";
+import GoBack from "../components/GoBack";
 
 export default function Login() {
   const [flow, setFlow] = useState<SelfServiceLoginFlow>();
 
-  // Get ?flow=... from the URL
   const router = useRouter();
+  const labels = useLabels();
+  const toasts = useToasts();
+
+  // Get ?flow=... from the URL
   const {
     return_to: returnTo,
     flow: flowId,
@@ -49,7 +54,16 @@ export default function Login() {
         .then(({ data }) => {
           setFlow(data);
         })
-        .catch(handleFlowError(router, "login", router.query, setFlow));
+        .catch(
+          handleFlowError(
+            router,
+            "login",
+            router.query,
+            setFlow,
+            labels,
+            toasts
+          )
+        );
       return;
     }
 
@@ -63,8 +77,10 @@ export default function Login() {
       .then(({ data }) => {
         setFlow(data);
       })
-      .catch(handleFlowError(router, "login", router.query, setFlow));
-  }, [flowId, router, router.isReady, aal, refresh, returnTo, flow]);
+      .catch(
+        handleFlowError(router, "login", router.query, setFlow, labels, toasts)
+      );
+  }, [flowId, router, router.isReady, aal, refresh, returnTo, flow, toasts]);
 
   const onSubmit = (values: SubmitSelfServiceLoginFlowBody) =>
     router
@@ -76,7 +92,7 @@ export default function Login() {
           .submitSelfServiceLoginFlow(String(flow?.id), values)
           // We logged in successfully! Let's bring the user home.
           .then(() => {
-            toast.success("Logged in!");
+            toasts.success(labels.toasts.messages.loggedIn);
             if (flow?.return_to) {
               window.location.href = flow?.return_to;
               return;
@@ -84,33 +100,42 @@ export default function Login() {
             router.push("/").then();
           })
           .then(() => {})
-          .catch(handleFlowError(router, "login", router.query, setFlow))
+          .catch(
+            handleFlowError(
+              router,
+              "login",
+              router.query,
+              setFlow,
+              labels,
+              toasts
+            )
+          )
       );
 
+  const title = flow?.refresh
+    ? labels.login.panel.title.refresh
+    : flow?.requested_aal == "aal2"
+    ? labels.login.panel.title.twoFactor
+    : labels.login.panel.title.default;
+
   return (
-    <Layout title={"login · webauth"}>
-      <Panel>
-        <PanelTitle>
-          {(() => {
-            if (flow?.refresh) {
-              return "Confirm Action";
-            } else if (flow?.requested_aal === "aal2") {
-              return "Two-Factor Authentication";
-            }
-            return "Sign In";
-          })()}
-        </PanelTitle>
-        <Flow onSubmit={onSubmit} flow={flow} />
-      </Panel>
-      <Panel>
-        {aal || refresh ? (
-          <CenterLink onClick={onLogout}>Log out</CenterLink>
-        ) : (
-          <Link href="/" passHref>
-            <CenterLink>Go back</CenterLink>
-          </Link>
-        )}
-      </Panel>
-    </Layout>
+    <Box>
+      <Head>{labels.login.title}</Head>
+      <Layout>
+        <Panel>
+          <PanelTitle>{title}</PanelTitle>
+          <Flow onSubmit={onSubmit} flow={flow} />
+        </Panel>
+        <Panel>
+          {aal || refresh ? (
+            <Anchor component="a" onClick={onLogout}>
+              {labels.logOut}
+            </Anchor>
+          ) : (
+            <GoBack />
+          )}
+        </Panel>
+      </Layout>
+    </Box>
   );
 }

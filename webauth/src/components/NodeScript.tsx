@@ -24,7 +24,14 @@ export const NodeScript = ({ attributes }: Props) => {
     return () => {
       document.body.removeChild(script);
     };
-  }, [attributes]);
+  }, [
+    attributes.src,
+    attributes.async,
+    attributes.crossorigin,
+    attributes.integrity,
+    attributes.referrerpolicy,
+    attributes.type,
+  ]);
 
   return null;
 };

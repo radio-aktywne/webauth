@@ -16,6 +16,7 @@ import { Component, FormEvent } from "react";
 
 import { Messages } from "./Messages";
 import { Node } from "./Node";
+import { Stack } from "@mantine/core";
 
 export type Values = Partial<
   | SubmitSelfServiceLoginFlowBody
@@ -165,33 +166,37 @@ export default class Flow<T extends Values> extends Component<
         method={flow.ui.method}
         onSubmit={this.handleSubmit}
       >
-        {!hideGlobalMessages ? <Messages messages={flow.ui.messages} /> : null}
-        {nodes.map((node, k) => {
-          const id = getNodeId(node) as keyof Values;
-          return (
-            <Node
-              key={`${id}-${k}`}
-              disabled={isLoading}
-              node={node}
-              value={values[id]}
-              dispatchSubmit={this.handleSubmit}
-              setValue={(value) =>
-                new Promise((resolve) => {
-                  this.setState(
-                    (state) => ({
-                      ...state,
-                      values: {
-                        ...state.values,
-                        [getNodeId(node)]: value,
-                      },
-                    }),
-                    resolve
-                  );
-                })
-              }
-            />
-          );
-        })}
+        <Stack>
+          {!hideGlobalMessages ? (
+            <Messages messages={flow.ui.messages} />
+          ) : null}
+          {nodes.map((node, k) => {
+            const id = getNodeId(node) as keyof Values;
+            return (
+              <Node
+                key={`${id}-${k}`}
+                disabled={isLoading}
+                node={node}
+                value={values[id]}
+                dispatchSubmit={this.handleSubmit}
+                setValue={(value) =>
+                  new Promise((resolve) => {
+                    this.setState(
+                      (state) => ({
+                        ...state,
+                        values: {
+                          ...state.values,
+                          [getNodeId(node)]: value,
+                        },
+                      }),
+                      resolve
+                    );
+                  })
+                }
+              />
+            );
+          })}
+        </Stack>
       </form>
     );
   }

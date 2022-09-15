@@ -8,21 +8,22 @@ import { ReactNode, useEffect, useState } from "react";
 import handleFlowError from "../lib/errors";
 import ory from "../lib/ory";
 import Flow, { Methods } from "../components/Flow";
-import PanelTitle from "../components/PanelTitle";
-import { H3, P } from "../components/Typography";
 import { Messages } from "../components/Messages";
-import CenterLink from "../components/CenterLink";
 import Layout from "../components/Layout";
 import Panel from "../components/Panel";
-import { toast } from "react-toastify";
-import Link from "../components/Link";
+import { useLabels } from "../contexts/labels";
+import { useToasts } from "../contexts/toasts";
+import { Box, Text } from "@mantine/core";
+import Head from "next/head";
+import GoBack from "../components/GoBack";
+import PanelTitle from "../components/PanelTitle";
 
 interface Props {
   flow?: SelfServiceSettingsFlow;
   only?: Methods;
 }
 
-function SettingsCard({
+function SettingsPanel({
   flow,
   only,
   children,
@@ -45,8 +46,11 @@ function SettingsCard({
 export default function Settings() {
   const [flow, setFlow] = useState<SelfServiceSettingsFlow>();
 
-  // Get ?flow=... from the URL
   const router = useRouter();
+  const labels = useLabels();
+  const toasts = useToasts();
+
+  // Get ?flow=... from the URL
   const { flow: flowId, return_to: returnTo } = router.query;
 
   useEffect(() => {
@@ -62,7 +66,16 @@ export default function Settings() {
         .then(({ data }) => {
           setFlow(data);
         })
-        .catch(handleFlowError(router, "settings", router.query, setFlow));
+        .catch(
+          handleFlowError(
+            router,
+            "settings",
+            router.query,
+            setFlow,
+            labels,
+            toasts
+          )
+        );
       return;
     }
 
@@ -74,8 +87,17 @@ export default function Settings() {
       .then(({ data }) => {
         setFlow(data);
       })
-      .catch(handleFlowError(router, "settings", router.query, setFlow));
-  }, [flowId, router, router.isReady, returnTo, flow]);
+      .catch(
+        handleFlowError(
+          router,
+          "settings",
+          router.query,
+          setFlow,
+          labels,
+          toasts
+        )
+      );
+  }, [flowId, router, router.isReady, returnTo, flow, toasts]);
 
   const onSubmit = (values: SubmitSelfServiceSettingsFlowBody) =>
     router
@@ -87,105 +109,97 @@ export default function Settings() {
           .submitSelfServiceSettingsFlow(String(flow?.id), values)
           .then(({ data }) => {
             // The settings have been saved and the flow was updated. Let's show it to the user!
-            toast.success("Settings saved!");
+            toasts.success(labels.toasts.messages.settingsSaved);
             setFlow(data);
           })
-          .catch(handleFlowError(router, "settings", router.query, setFlow))
+          .catch(
+            handleFlowError(
+              router,
+              "settings",
+              router.query,
+              setFlow,
+              labels,
+              toasts
+            )
+          )
       );
 
   return (
-    <Layout title={"settings · webauth"}>
-      <PanelTitle>Profile Management and Security Settings</PanelTitle>
-      <SettingsCard only="profile" flow={flow}>
-        <H3>Profile Settings</H3>
-        <Messages messages={flow?.ui.messages} />
-        <Flow
-          hideGlobalMessages
-          onSubmit={onSubmit}
-          only="profile"
-          flow={flow}
-        />
-      </SettingsCard>
-      <SettingsCard only="password" flow={flow}>
-        <H3>Change Password</H3>
+    <Box>
+      <Head>
+        <title>{labels.settings.title}</title>
+      </Head>
+      <Layout>
+        <SettingsPanel only="profile" flow={flow}>
+          <PanelTitle>{labels.settings.panels.profile.title}</PanelTitle>
+          <Messages messages={flow?.ui.messages} />
+          <Flow
+            hideGlobalMessages
+            onSubmit={onSubmit}
+            only="profile"
+            flow={flow}
+          />
+        </SettingsPanel>
+        <SettingsPanel only="password" flow={flow}>
+          <PanelTitle>{labels.settings.panels.password.title}</PanelTitle>
 
-        <Messages messages={flow?.ui.messages} />
-        <Flow
-          hideGlobalMessages
-          onSubmit={onSubmit}
-          only="password"
-          flow={flow}
-        />
-      </SettingsCard>
-      <SettingsCard only="oidc" flow={flow}>
-        <H3>Manage Social Sign In</H3>
+          <Messages messages={flow?.ui.messages} />
+          <Flow
+            hideGlobalMessages
+            onSubmit={onSubmit}
+            only="password"
+            flow={flow}
+          />
+        </SettingsPanel>
+        <SettingsPanel only="oidc" flow={flow}>
+          <PanelTitle>{labels.settings.panels.oidc.title}</PanelTitle>
 
-        <Messages messages={flow?.ui.messages} />
-        <Flow hideGlobalMessages onSubmit={onSubmit} only="oidc" flow={flow} />
-      </SettingsCard>
-      <SettingsCard only="lookup_secret" flow={flow}>
-        <H3>Manage 2FA Backup Recovery Codes</H3>
-        <Messages messages={flow?.ui.messages} />
-        <P>
-          Recovery codes can be used in panic situations where you have lost
-          access to your 2FA device.
-        </P>
+          <Messages messages={flow?.ui.messages} />
+          <Flow
+            hideGlobalMessages
+            onSubmit={onSubmit}
+            only="oidc"
+            flow={flow}
+          />
+        </SettingsPanel>
+        <SettingsPanel only="lookup_secret" flow={flow}>
+          <PanelTitle>{labels.settings.panels.lookupSecret.title}</PanelTitle>
+          <Messages messages={flow?.ui.messages} />
+          <Text>{labels.settings.panels.lookupSecret.description}</Text>
 
-        <Flow
-          hideGlobalMessages
-          onSubmit={onSubmit}
-          only="lookup_secret"
-          flow={flow}
-        />
-      </SettingsCard>
-      <SettingsCard only="totp" flow={flow}>
-        <H3>Manage 2FA TOTP Authenticator App</H3>
-        <P>
-          Add a TOTP Authenticator App to your account to improve your account
-          security. Popular Authenticator Apps are{" "}
-          <a href="https://www.lastpass.com" rel="noreferrer" target="_blank">
-            LastPass
-          </a>{" "}
-          and Google Authenticator (
-          <a
-            href="https://apps.apple.com/us/app/google-authenticator/id388497605"
-            target="_blank"
-            rel="noreferrer"
-          >
-            iOS
-          </a>
-          ,{" "}
-          <a
-            href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Android
-          </a>
-          ).
-        </P>
-        <Messages messages={flow?.ui.messages} />
-        <Flow hideGlobalMessages onSubmit={onSubmit} only="totp" flow={flow} />
-      </SettingsCard>
-      <SettingsCard only="webauthn" flow={flow}>
-        <H3>Manage Hardware Tokens and Biometrics</H3>
-        <Messages messages={flow?.ui.messages} />
-        <P>
-          Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID,
-          TouchID) to enhance your account security.
-        </P>
-        <Flow
-          hideGlobalMessages
-          onSubmit={onSubmit}
-          only="webauthn"
-          flow={flow}
-        />
-      </SettingsCard>
-      <Panel>
-        <Link href="/" passHref>
-          <CenterLink>Go back</CenterLink>
-        </Link>
-      </Panel>
-    </Layout>
+          <Flow
+            hideGlobalMessages
+            onSubmit={onSubmit}
+            only="lookup_secret"
+            flow={flow}
+          />
+        </SettingsPanel>
+        <SettingsPanel only="totp" flow={flow}>
+          <PanelTitle>{labels.settings.panels.totp.title}</PanelTitle>
+          <Text>{labels.settings.panels.totp.description}</Text>
+          <Messages messages={flow?.ui.messages} />
+          <Flow
+            hideGlobalMessages
+            onSubmit={onSubmit}
+            only="totp"
+            flow={flow}
+          />
+        </SettingsPanel>
+        <SettingsPanel only="webauthn" flow={flow}>
+          <PanelTitle>{labels.settings.panels.webauthn.title}</PanelTitle>
+          <Messages messages={flow?.ui.messages} />
+          <Text>{labels.settings.panels.webauthn.description}</Text>
+          <Flow
+            hideGlobalMessages
+            onSubmit={onSubmit}
+            only="webauthn"
+            flow={flow}
+          />
+        </SettingsPanel>
+        <Panel>
+          <GoBack />
+        </Panel>
+      </Layout>
+    </Box>
   );
 }

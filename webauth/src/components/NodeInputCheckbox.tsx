@@ -1,6 +1,7 @@
+import { Checkbox } from "@mantine/core";
 import { getNodeLabel } from "@ory/integrations/ui";
 import { NodeInputProps } from "../lib/ui";
-import Checkbox from "./Checkbox";
+import { useCallback } from "react";
 
 export function NodeInputCheckbox<T>({
   node,
@@ -8,22 +9,34 @@ export function NodeInputCheckbox<T>({
   setValue,
   disabled,
 }: NodeInputProps) {
-  // Render a checkbox.s
+  // Render a checkbox
+
+  const onChange = useCallback(
+    (value: string[]) => {
+      setValue(value.length > 0).then();
+    },
+    [setValue]
+  );
+
+  const error = node.messages
+    ? node.messages.map((e) => e.text).join("\n")
+    : undefined;
+
+  const label = getNodeLabel(node);
+
   return (
-    <>
+    <Checkbox.Group
+      error={error}
+      onChange={onChange}
+      required={attributes.required}
+      value={attributes.value ? ["checkbox"] : []}
+    >
       <Checkbox
         name={attributes.name}
-        defaultChecked={attributes.value === true}
-        onChange={(e) => setValue(e.target.checked)}
+        value="checkbox"
         disabled={attributes.disabled || disabled}
-        label={getNodeLabel(node)}
-        state={
-          node.messages.find(({ type }) => type === "error")
-            ? "error"
-            : undefined
-        }
-        subtitle={node.messages.map(({ text }) => text).join("\n")}
+        label={label}
       />
-    </>
+    </Checkbox.Group>
   );
 }

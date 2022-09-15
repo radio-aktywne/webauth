@@ -1,15 +1,18 @@
 import { AxiosError } from "axios";
 import { NextRouter } from "next/router";
 import { Dispatch, SetStateAction } from "react";
-import { toast } from "react-toastify";
 import { ParsedUrlQuery } from "querystring";
+import { ToastsContext } from "../contexts/toasts";
+import { Labels } from "../theme/labels";
 
 // A small function to help us deal with errors coming from fetching a flow.
 export default function handleFlowError<S>(
   router: NextRouter,
   page: "login" | "recover" | "register" | "settings" | "verify",
   query: ParsedUrlQuery,
-  setFlow: Dispatch<SetStateAction<S | undefined>>
+  setFlow: Dispatch<SetStateAction<S | undefined>>,
+  labels: Labels,
+  toasts: ToastsContext
 ) {
   return async (err: AxiosError) => {
     switch (err.response?.data.error?.id) {
@@ -31,24 +34,25 @@ export default function handleFlowError<S>(
         return;
       case "self_service_flow_return_to_forbidden":
         // The flow expired, let's request a new one.
-        toast.error("The redirect address is not allowed.");
+        toasts.error(labels.toasts.messages.redirectNotAllowed);
         setFlow(undefined);
         await router.push("/" + page);
         return;
       case "self_service_flow_expired":
         // The flow expired, let's request a new one.
-        toast.error("Your interaction expired.");
+        toasts.error(labels.toasts.messages.flowExpired);
         setFlow(undefined);
         await router.push("/" + page);
         return;
       case "security_csrf_violation":
         // A CSRF violation occurred. Best to just refresh the flow!
-        toast.error("A security violation was detected.");
+        toasts.error(labels.toasts.messages.securityViolation);
         setFlow(undefined);
         await router.push("/" + page);
         return;
       case "security_identity_mismatch":
         // The requested item was intended for someone else. Let's request a new flow...
+        toasts.error(labels.toasts.messages.identityMismatch);
         setFlow(undefined);
         await router.push("/" + page);
         return;
@@ -58,7 +62,7 @@ export default function handleFlowError<S>(
         return;
       case "session_inactive":
         // Tried to access some resource available only to signed-in users.
-        toast.error("You need to sign in first.");
+        toasts.error(labels.toasts.messages.sessionInactive);
         await router.push("/");
         return;
     }
@@ -67,18 +71,20 @@ export default function handleFlowError<S>(
       case 400:
         if (!err.response?.data?.error) {
           // Bad request without an error field is a form validation error
-          toast.error("Input is invalid.");
+          toasts.error(labels.toasts.messages.invalidInput);
           setFlow(err.response?.data);
           return;
         }
         break;
       case 410:
         // The flow expired, let's request a new one.
+        toasts.warning(labels.toasts.messages.flowExpired);
         setFlow(undefined);
         await router.push("/" + page);
         return;
       case 500:
         // Internal Kratos error
+        toasts.error(labels.toasts.messages.internalServerError);
         setFlow(undefined);
         await router.push("/" + page);
         return;
@@ -86,7 +92,7 @@ export default function handleFlowError<S>(
 
     if (err.response?.data?.error?.reason) {
       // If there is a reason for this error, let's display it and redirect to the main page.
-      toast.error(err.response?.data?.error?.reason);
+      toasts.error(err.response?.data?.error?.reason);
       await router.push("/");
       return;
     }

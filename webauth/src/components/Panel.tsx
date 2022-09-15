@@ -1,26 +1,23 @@
+import { createStyles, Paper, Stack } from "@mantine/core";
 import React from "react";
-import * as tw from "tailwindcss-classnames";
-import { TailwindClass } from "../lib/ui";
 
-export type PanelProps = TailwindClass<React.HTMLAttributes<HTMLDivElement>>;
+export type PanelProps = {
+  children: React.ReactNode;
+};
 
-export default function Panel({ className, ...props }: PanelProps) {
+const useStyles = createStyles((theme) => ({
+  paper: {
+    padding: theme.spacing.xl,
+    boxShadow: theme.shadows.sm,
+  },
+}));
+
+export default function Panel({ children }: PanelProps) {
+  const { classes } = useStyles();
+
   return (
-    <div
-      className={tw.classnames(
-        tw.backgroundColor("bg-white"),
-        tw.borderWidth("border"),
-        tw.borderStyle("border-solid"),
-        tw.borderColor("border-gray-200"),
-        tw.display("flex"),
-        tw.flexDirection("flex-col"),
-        tw.alignItems("items-stretch"),
-        tw.width("w-[40rem]" as tw.TTailwindString),
-        tw.margin("m-1"),
-        tw.padding("p-5"),
-        className
-      )}
-      {...props}
-    />
+    <Paper className={classes.paper} withBorder>
+      <Stack>{children}</Stack>
+    </Paper>
   );
 }

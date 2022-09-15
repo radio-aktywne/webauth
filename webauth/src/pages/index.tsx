@@ -5,14 +5,16 @@ import { useEffect, useState } from "react";
 import ory from "../lib/ory";
 import { createLogoutHandler } from "../lib/hooks";
 import Layout from "../components/Layout";
-import LinkButton from "../components/LinkButton";
-import Button from "../components/Button";
 import Panel from "../components/Panel";
+import { Box, Button } from "@mantine/core";
+import Head from "next/head";
+import labels from "../theme/labels";
 import Link from "../components/Link";
 
 export default function Index() {
   const [hasSession, setHasSession] = useState<boolean>(undefined);
   const router = useRouter();
+
   const onLogout = createLogoutHandler();
 
   useEffect(() => {
@@ -43,22 +45,39 @@ export default function Index() {
   if (hasSession === undefined) return null;
 
   return (
-    <Layout title="webauth">
-      <Panel>
-        <Link href="/login">
-          <LinkButton disabled={hasSession} title={"Login"}>
-            Login
-          </LinkButton>
-        </Link>
-        <Link href="/settings">
-          <LinkButton disabled={!hasSession} title={"Settings"}>
-            Settings
-          </LinkButton>
-        </Link>
-        <Button onClick={onLogout} disabled={!hasSession} title={"Logout"}>
-          Logout
-        </Button>
-      </Panel>
-    </Layout>
+    <Box>
+      <Head>
+        <title>{labels.index.title}</title>
+      </Head>
+      <Layout>
+        <Panel>
+          <Link href="/login" disabled={hasSession} passHref>
+            <Button
+              component="a"
+              disabled={hasSession}
+              title={labels.index.buttons.login}
+            >
+              {labels.index.buttons.login}
+            </Button>
+          </Link>
+          <Link href="/settings" disabled={!hasSession} passHref>
+            <Button
+              component="a"
+              disabled={!hasSession}
+              title={labels.index.buttons.settings}
+            >
+              {labels.index.buttons.settings}
+            </Button>
+          </Link>
+          <Button
+            onClick={onLogout}
+            disabled={!hasSession}
+            title={labels.index.buttons.logout}
+          >
+            {labels.index.buttons.logout}
+          </Button>
+        </Panel>
+      </Layout>
+    </Box>
   );
 }

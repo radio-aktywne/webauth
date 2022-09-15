@@ -1,18 +1,18 @@
-import NextLink, { LinkProps } from "next/link";
+import NextLink from "next/link";
 import React from "react";
 
-const RefWrapper = React.forwardRef<any, React.PropsWithChildren<{}>>(
-  ({ children, ...props }, ref) =>
-    React.isValidElement(children) ? React.cloneElement(children, props) : null
-);
+export type LinkProps = React.ComponentProps<typeof NextLink> & {
+  disabled?: boolean;
+};
 
 export default function Link({
+  disabled = false,
   children,
   ...props
-}: React.PropsWithChildren<LinkProps>) {
-  return (
-    <NextLink {...props}>
-      <RefWrapper>{children}</RefWrapper>
-    </NextLink>
+}: LinkProps) {
+  return disabled ? (
+    <>{children}</>
+  ) : (
+    <NextLink {...props}>{children}</NextLink>
   );
 }

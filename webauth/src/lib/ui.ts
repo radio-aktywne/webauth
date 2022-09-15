@@ -1,6 +1,5 @@
 import { UiNode, UiNodeInputAttributes } from "@ory/client";
 import { FormEvent } from "react";
-import { TTailwindString } from "tailwindcss-classnames";
 
 export type ValueSetter = (
   value: string | number | boolean | undefined
@@ -16,7 +15,3 @@ export interface NodeInputProps {
   dispatchSubmit: FormDispatcher;
   setValue: ValueSetter;
 }
-
-export type TailwindClass<T> = T & {
-  className?: TTailwindString;
-};

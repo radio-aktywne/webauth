@@ -1,21 +1,17 @@
+import { Anchor, AnchorProps, createStyles } from "@mantine/core";
 import React from "react";
-import * as tw from "tailwindcss-classnames";
-import { Link } from "./Typography";
-import { TailwindClass } from "../lib/ui";
 
-export type CenterLinkProps = TailwindClass<
-  React.AnchorHTMLAttributes<HTMLAnchorElement>
->;
+export type CenterLinkProps = Omit<AnchorProps, "component" | "className">;
 
-export default function CenterLink({ className, ...props }: CenterLinkProps) {
-  return (
-    <Link
-      className={tw.classnames(
-        tw.textAlign("text-center"),
-        tw.fontSize("text-sm"),
-        className
-      )}
-      {...props}
-    />
-  );
+const useStyles = createStyles((theme) => ({
+  anchor: {
+    textAlign: "center",
+    fontSize: theme.fontSizes.xs,
+  },
+}));
+
+export default function CenterLink(props: CenterLinkProps) {
+  const { classes } = useStyles();
+
+  return <Anchor component="a" className={classes.anchor} {...props} />;
 }
