@@ -31,8 +31,6 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
     ? otherMessages.map((e) => e.text).join("\n")
     : undefined;
 
-  console.log(errors);
-
   // Render a generic text input field.
   return (
     <TextInput
